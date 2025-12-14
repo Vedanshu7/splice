@@ -1,0 +1,19 @@
+{
+  "expo": {
+    "name": "Splice",
+    "slug": "splice",
+    "scheme": "splice",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.vedanshujoshi.splice"
+    },
+    "android": {
+      "package": "com.vedanshujoshi.splice"
+    },
+    "plugins": ["expo-router"]
+  }
+}
