@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint (all workspaces)
+        run: pnpm -r lint
+
+      - name: Test API
+        run: pnpm --filter @splice/api test
+
+      - name: Typecheck + build API
+        run: pnpm --filter @splice/api build
+
+      - name: Test web
+        run: pnpm --filter @splice/web test
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder
+          NEXT_PUBLIC_API_URL: http://localhost:4000
+
+      - name: Test mobile
+        run: pnpm --filter @splice/mobile test
+
+      - name: Typecheck + build web
+        run: pnpm --filter @splice/web build
+        env:
+          # Dummy values: the build only needs these strings to be present,
+          # it doesn't make real Supabase calls at build time.
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder
+          NEXT_PUBLIC_API_URL: http://localhost:4000
+          APP_SESSION_SECRET: 00000000000000000000000000000000
+
+      - name: Typecheck mobile
+        run: pnpm --filter @splice/mobile exec tsc --noEmit
